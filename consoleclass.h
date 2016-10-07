@@ -18,6 +18,9 @@ public:
 
     QByteArray convert2utf8(const QStringList &list, bool &ok);
 
+    QByteArray compressDecompressData(const bool &compress, const QStringList &list, bool &ok);
+
+
     QByteArray getHashSumm(const QStringList &list, bool &ok);
 
 

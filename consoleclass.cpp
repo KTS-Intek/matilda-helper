@@ -5,12 +5,12 @@
 #include <QTextCodec>
 #include <QCryptographicHash>
 //#include <QDebug>
-
+//------------------------------------------------------------------------------------------
 ConsoleClass::ConsoleClass(QObject *parent) : QObject(parent)
 {
 
 }
-
+//------------------------------------------------------------------------------------------
 int ConsoleClass::checkArgs( QStringList list)
 {
 
@@ -21,7 +21,7 @@ int ConsoleClass::checkArgs( QStringList list)
     QByteArray msg;
     if(list.size() > 2){
 
-        QStringList lk = QString("-l -u -hs").split(" ", QString::SkipEmptyParts);
+        QStringList lk = QString("-l -u -zc -zd -hs").split(" ", QString::SkipEmptyParts);
 
 
         list.removeFirst();
@@ -32,7 +32,9 @@ int ConsoleClass::checkArgs( QStringList list)
         switch(lk.indexOf(key)){
         case 0: msg = convert2local8bit(list, ok); stream.setCodec(QTextCodec::codecForLocale());  break;
         case 1: msg = convert2utf8(list, ok); stream.setCodec("UTF-8"); break;
-        case 2: msg = getHashSumm(list, ok); break;
+        case 2: msg = compressDecompressData(true, list, ok); break;
+        case 3: msg = compressDecompressData(false, list, ok);; break;
+        case 4: msg = getHashSumm(list, ok); break;
 
         default: msg = "unknown key " + key.toLocal8Bit(); break;
         }
@@ -50,12 +52,14 @@ int ConsoleClass::checkArgs( QStringList list)
         stream << showHelp() << endl;
     return ok ? 0 : 23;
 }
-
+//------------------------------------------------------------------------------------------
 QByteArray ConsoleClass::showHelp()
 {
     QByteArray arr;
     arr.append("-l Convert UTF-8 to local  [in data format] [out format] [in data....]\r\n");
     arr.append("-u Convert local to UTF-8  [in data format] [out format] [in data....]\r\n");
+    arr.append("-zc Compress data using zlib algorithm [in data format] [out format] [in data....]\r\n");
+    arr.append("-zd Decompress data using zlib algorithm [in data format] [out format] [in data....]\r\n");
     arr.append("-hs Get hash summ, arguments: [in data format] [hash algorithm] [out format] [in data....]\r\n"
                "\r\n\t [in data format]: -t text, -b base64, -h hex\r\n"
                "\t [hash algorithm]: Md4,Md5,Sha1,Sha224,Sha256,Sha384,Sha512,Sha3_224,Sha3_256,Sha3_384,Sha3_512\r\n"
@@ -63,7 +67,7 @@ QByteArray ConsoleClass::showHelp()
                "\t [in data ...]: input data");
     return arr;
 }
-
+//------------------------------------------------------------------------------------------
 QByteArray ConsoleClass::convert2local8bit(const QStringList &list, bool &ok)
 {
     ok = true;
@@ -82,7 +86,7 @@ QByteArray ConsoleClass::convert2local8bit(const QStringList &list, bool &ok)
 
     return convertOutData(list.at(1), inData, ok);// list.join(" ").toLocal8Bit().toHex();
 }
-
+//------------------------------------------------------------------------------------------
 QByteArray ConsoleClass::convert2utf8(const QStringList &list, bool &ok)
 {
     ok = true;
@@ -97,7 +101,19 @@ QByteArray ConsoleClass::convert2utf8(const QStringList &list, bool &ok)
 
     return convertOutData(list.at(1), inData, ok);
 }
+//------------------------------------------------------------------------------------------
+QByteArray ConsoleClass::compressDecompressData(const bool &compress, const QStringList &list, bool &ok)
+{
+    ok = true;
+    if(list.size() < 3){
+        ok = false;
+        return QByteArray("size < 3, size = ") + QByteArray::number(list.size());
+    }
+    QByteArray inData = convertData(list.at(0), QVariant(list.mid(2).join(" ")).toByteArray(), ok);
 
+    return convertOutData(list.at(1), (compress) ? qCompress(inData, 9) : qUncompress(inData), ok);
+}
+//------------------------------------------------------------------------------------------
 QByteArray ConsoleClass::getHashSumm(const QStringList &list, bool &ok)
 {
 //index
@@ -132,7 +148,7 @@ QByteArray ConsoleClass::getHashSumm(const QStringList &list, bool &ok)
     else
         return inData;
 }
-
+//------------------------------------------------------------------------------------------
 int ConsoleClass::hshSummVal(const QString &arg)
 {
     int alg;
@@ -160,7 +176,7 @@ int ConsoleClass::hshSummVal(const QString &arg)
        }
        return alg;
 }
-
+//------------------------------------------------------------------------------------------
 QByteArray ConsoleClass::convertData(const QString &key, const QByteArray &inData, bool &ok)
 {
     ok = true;
@@ -174,7 +190,7 @@ QByteArray ConsoleClass::convertData(const QString &key, const QByteArray &inDat
     }
     return outData;
 }
-
+//------------------------------------------------------------------------------------------
 QByteArray ConsoleClass::convertOutData(const QString &key, const QByteArray &inData, bool &ok)
 {
     ok = true;
@@ -188,9 +204,10 @@ QByteArray ConsoleClass::convertOutData(const QString &key, const QByteArray &in
     }
     return outData;
 }
-
+//------------------------------------------------------------------------------------------
 QStringList ConsoleClass::getHshNames()
 {
     return QString("Md4,Md5,Sha1,Sha224,Sha256,Sha384,Sha512,Sha3_224,Sha3_256,Sha3_384,Sha3_512").split(",");
 
 }
+//------------------------------------------------------------------------------------------
