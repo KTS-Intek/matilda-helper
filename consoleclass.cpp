@@ -4,7 +4,7 @@
 #include <QTextStream>
 #include <QTextCodec>
 #include <QCryptographicHash>
-//#include <QDebug>
+#include <QDebug>
 //------------------------------------------------------------------------------------------
 ConsoleClass::ConsoleClass(QObject *parent) : QObject(parent)
 {
@@ -78,11 +78,13 @@ QByteArray ConsoleClass::convert2local8bit(const QStringList &list, bool &ok)
 
     QByteArray inData = convertData(list.at(0), QString(list.mid(2).join(" ")).toLocal8Bit(), ok);
 
-//    qDebug() << inData.toHex();
+    QString str = "сьогодні_сонце_світить_краще_ніж_учора";
+
+    qDebug() << str.toLocal8Bit().toHex();// QString(list.mid(2).join(" ")).toLocal8Bit().toHex();
 
     inData = QString(inData).toLocal8Bit();
 
-//    qDebug() << inData.toHex();
+    qDebug() << inData.toHex();
 
     return convertOutData(list.at(1), inData, ok);// list.join(" ").toLocal8Bit().toHex();
 }

@@ -1,0 +1,23 @@
+1. Hash
+Debug$ ./matilda-helper -hs -t Sha3_512 -b hello_world
+MJm4WyxIs0TpmX24Fk9J8CSdh2s/FeKm6OjrBi9W9p+f3MtVIt9In99q93oqyJhqNhhOW6Z51Ic/lbSFws00sA
+
+Debug$ ./matilda-helper -hs -t Sha1 -b hello_world
+5OzW/BGJhWWvJJd+mSzqDJx7cCU
+
+2. Compress
+Debug$ ./matilda-helper -zc -t -b hello_world
+AAAAC3jay0jNycmPL88vykkBABuFBJw
+
+Debug$ ./matilda-helper -zc -t -b hello_world_123456789
+AAAAFXjay0jNycmPL88vykmJNzQyNjE1M7ewBABWaAbY
+
+
+3. Decompress
+Debug$ ./matilda-helper -zd -b -t AAAAC3jay0jNycmPL88vykkBABuFBJw
+hello_world
+
+Debug$ ./matilda-helper -zd -b -t AAAAFXjay0jNycmPL88vykmJNzQyNjE1M7ewBABWaAbY
+hello_world_123456789
+
+
